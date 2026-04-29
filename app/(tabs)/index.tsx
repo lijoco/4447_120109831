@@ -1,98 +1,85 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import GoalCard from '@/components/GoalCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useState } from 'react';
+import { Button } from 'react-native';
 
-export default function HomeScreen() {
+type Goal = {
+  id: number;
+  title: string;
+  description: string;
+  deadline: string;
+  count: number;
+};
+
+export default function IndexScreen() {
+  const [goals, setGoals] = useState<Goal[]>([
+    { id: 1, title: "UX", description: "Attend all", deadline: "May", count: 0 },
+    { id: 2, title: "AI", description: "Attend all", deadline: "May", count: 0 },
+    { id: 3, title: "Mobile Dev", description: "Attend all", deadline: "May", count: 0 },
+  ]);
+
+  // Update count for a specific goal
+  const updateCount = (id: number, delta: number) => {
+    setGoals(prev =>
+      prev.map(goal =>
+        goal.id === id
+          // the ... is the spread operator, it creates a new object with all the same properties as goal, but then we override the count property with the new value
+          ? { ...goal, count: goal.count + delta }
+          : goal
+      )
+    );
+  };
+
+  // Remove Goal
+  const removeGoal = (id: number) => {
+    setGoals(prev => prev.filter(goal => goal.id !== id));
+  };
+
+  // Reset all counts to zero
+  const resetAll = () => {
+    setGoals(prev =>
+      prev.map(goal => ({ ...goal, count: 0 }))
+    );
+  };
+
+// Note: This is a derived value, not state. It will be recalculated on every render.
+  const total = goals.reduce((sum, s) => sum + s.count, 0);
+
+
+  // Return the UI
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ThemedView style={{ padding: 20 }}>
+      <ThemedText style={{ fontSize: 30, fontWeight: 'bold', marginVertical: 5}}>
+        Welcome Rolla
+      </ThemedText>
+      <ThemedText>Get to Class</ThemedText>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+      {/* Count */}
+      <ThemedView style={{ marginVertical: 20 }}>
+        <ThemedText style={{ fontSize: 20, marginVertical: 5 }}>
+          Total Count: {total}
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+
+      {/* Reset button */}
+      <ThemedView style={{ marginBottom: 20 }}>
+        <Button title="Reset All" onPress={resetAll} />
       </ThemedView>
-    </ParallaxScrollView>
+      
+      {/* Cards */}
+      {goals.map(goal => (
+        <GoalCard
+          key={goal.id}
+          id={goal.id}
+          GoalTitle={goal.title}
+          GoalDescription={goal.description}
+          GoalDeadline={goal.deadline}
+          count={goal.count}
+          onUpdate={updateCount}
+          onRemove={removeGoal}
+        />
+      ))}
+    </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
