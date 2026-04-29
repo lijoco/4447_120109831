@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -11,6 +10,7 @@ type GoalCardProps = {
     count: number;
     onUpdate: (id: number, delta: number) => void;
     onRemove: (id: number) => void;
+    onEdit: (id: number) => void;
 };
 
 export default function GoalCard({
@@ -21,19 +21,23 @@ export default function GoalCard({
     count,
     onUpdate,
     onRemove,
+    onEdit,
 
 }: GoalCardProps) {
+    // UI for each goal card.
     return (
         <ThemedView style={{ marginBottom: 12, padding: 10, borderWidth: 1 }}>
-            <ThemedText style={{ fontSize: 18 }}> {GoalTitle} </ThemedText>
+            <ThemedText type='subtitle'> {GoalTitle} </ThemedText>
             <ThemedText> {GoalDescription} </ThemedText>
             <ThemedText> Deadline: {GoalDeadline} </ThemedText>
 
             <ThemedText style={{ marginVertical: 5 }}> Count: {count} </ThemedText>
 
+            {/* Button +1 */}
             <ThemedView style={{ marginTop: 10 }}>
                 <Button title="+1" onPress={() => onUpdate(id, + 1)} />
             </ThemedView>
+            {/* Button -1 */}
             <ThemedView style={{ marginTop: 10 }}>
                 <Button title="-1" onPress={() => onUpdate(id, - 1)} />
             </ThemedView>
@@ -46,7 +50,14 @@ export default function GoalCard({
                 {count < 0 && 'Negative'}
                 {count === 0 && 'Zero'}
             </ThemedText>
-            <ThemedView style={{ marginTop: 5 }}>
+
+            {/* Edit Button */}
+            <ThemedView style={{ marginTop: 10 }}>
+                <Button title="Edit" onPress={() => onEdit(id)} />
+            </ThemedView>
+
+            {/* Remove Button */}
+            <ThemedView style={{ marginTop: 10 }}>
                 <Button title="Remove" onPress={() => onRemove(id)} />
             </ThemedView>
 
