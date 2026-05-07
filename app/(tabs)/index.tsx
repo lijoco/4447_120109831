@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Goal, GoalContext } from '../_layout';
+import { ThemedView } from '@/components/themed-view';
 
 
 export default function IndexScreen() {
@@ -23,7 +24,9 @@ export default function IndexScreen() {
       <ScreenHeader title="Goals" subtitle="Manage your goals" />
 
 
+      <ThemedView style={styles.buttonContainer}>
       <PrimaryButton title="Add Goal" onPress={() => router.push({ pathname: '../add' })} />
+      </ThemedView>
 
         <ScrollView contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
@@ -46,5 +49,10 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 20,
     paddingHorizontal: 20,
+  },
+  buttonContainer: {
+    marginBottom: 20,
+    marginHorizontal: 20,
+
   },
 });

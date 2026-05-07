@@ -1,41 +1,72 @@
+// components/ui/primary-button.tsx
 import { Pressable, StyleSheet } from 'react-native';
-import { ThemedText } from '../themed-text';
+import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 type PrimaryButtonProps = {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
   compact?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
 };
 
-export default function PrimaryButton({ 
-  title, 
-  onPress, 
-  variant = 'primary', 
+export default function PrimaryButton({
+  title,
+  onPress,
   compact = false,
-  disabled = false 
+  variant = 'primary',
+  disabled = false,
 }: PrimaryButtonProps) {
   const primaryBg = useThemeColor({}, 'tint');
-  const secondaryBg = useThemeColor({ light: '#E2E8F0', dark: '#334155' }, 'background');
+  const secondaryBg = useThemeColor({ light: '#F8FAFC', dark: '#1E293B' }, 'background');
+  const dangerBg = useThemeColor({ light: '#dc0606', dark: '#7F1D1D' }, 'background');
+  
+  const secondaryBorder = useThemeColor({ light: '#94A3B8', dark: '#475569' }, 'border');
+  const dangerBorder = useThemeColor({ light: '#FCA5A5', dark: '#991B1B' }, 'border');
+  
+  const secondaryTextColor = useThemeColor({ light: '#0F172A', dark: '#ECEDEE' }, 'text');
+  const dangerTextColor = useThemeColor({ light: 'white', dark: '#FCA5A5' }, 'text');
+
+  const getBackgroundColor = () => {
+    if (disabled) return { opacity: 0.5 };
+    if (variant === 'primary') return { backgroundColor: primaryBg };
+    if (variant === 'secondary') return { backgroundColor: secondaryBg };
+    if (variant === 'danger') return { backgroundColor: dangerBg };
+    return { backgroundColor: primaryBg };
+  };
+
+  const getBorderStyles = () => {
+    if (variant === 'secondary') return { borderColor: secondaryBorder, borderWidth: 1 };
+    if (variant === 'danger') return { borderColor: dangerBorder, borderWidth: 1 };
+    return {};
+  };
+
+  const getTextColor = () => {
+    if (variant === 'secondary') return { color: secondaryTextColor };
+    if (variant === 'danger') return { color: dangerTextColor };
+    return {};
+  };
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.container,
-        { backgroundColor: variant === 'primary' ? primaryBg : secondaryBg },
-        compact && styles.compact,
-        pressed && styles.pressed,
-        disabled && styles.disabled,
-      ]}
+      accessibilityLabel={title}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
       onPress={onPress}
       disabled={disabled}
+      style={({ pressed }) => [
+        styles.button,
+        getBackgroundColor(),
+        getBorderStyles(),
+        compact && styles.compact,
+        pressed && styles.pressed,
+      ]}
     >
-      <ThemedText 
+      <ThemedText
         style={[
           styles.label,
-          variant === 'secondary' && styles.secondaryLabel,
+          getTextColor(),
           compact && styles.compactLabel,
         ]}
       >
@@ -46,31 +77,24 @@ export default function PrimaryButton({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+  button: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 20,
-    marginVertical: 8,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
   },
   compact: {
+    alignSelf: 'flex-start',
+    marginTop: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   pressed: {
     opacity: 0.85,
   },
-  disabled: {
-    opacity: 0.5,
-  },
   label: {
     fontSize: 15,
-    fontWeight: '600',
-  },
-  secondaryLabel: {
-    // ThemedText handles the color
+    fontWeight: '500',
   },
   compactLabel: {
     fontSize: 13,

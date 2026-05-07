@@ -1,10 +1,12 @@
-// components/FormField.tsx
+// components/ui/form-field.tsx
 import { StyleSheet, View } from 'react-native';
-import { ThemedText } from '../themed-text';
-import { ThemedTextInput } from '../themed-text';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedTextInput } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { ThemedView } from '@/components/themed-view';
 
-type Props = {
+
+type FormFieldProps = {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -20,15 +22,19 @@ export default function FormField({
   placeholder,
   secureTextEntry = false,
   keyboardType = 'default'
-}: Props) {
+}: FormFieldProps) {
   const labelColor = useThemeColor({ light: '#334155', dark: '#94A3B8' }, 'text');
 
   return (
-    <View style={styles.wrapper}>
+    <ThemedView style={[styles.card, {borderRadius:14}]}>
+
       <ThemedText style={[styles.label, { color: labelColor }]}>
         {label}
       </ThemedText>
+
       <ThemedTextInput
+        accessibilityLabel={label}
+        accessibilityHint={`Enter ${label.toLowerCase()}`}
         placeholder={placeholder ?? label}
         value={value}
         onChangeText={onChangeText}
@@ -36,26 +42,24 @@ export default function FormField({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
       />
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  card: {
     marginBottom: 16,
-    paddingHorizontal: 20,
+    padding: 10,
   },
   label: {
-    fontSize: 13,
     fontWeight: '600',
     marginBottom: 6,
   },
   input: {
-    backgroundColor: 'transparent',
     borderWidth: 1,
     borderRadius: 10,
     fontSize: 15,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    padding: 16,
+    marginBottom: 10,
   },
 });

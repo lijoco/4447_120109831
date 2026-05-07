@@ -49,7 +49,7 @@ export default function GoalDetail() {
       />
 
       <View style={styles.buttonSpacing}>
-        <PrimaryButton title="Delete" variant="secondary" onPress={deleteGoal} />
+        <PrimaryButton title="Delete" variant="danger" onPress={deleteGoal} />
       </View>
       <View style={styles.buttonSpacing}>
         <PrimaryButton title="Back" variant="secondary" onPress={() => router.back()} />
