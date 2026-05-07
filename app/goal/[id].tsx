@@ -35,8 +35,9 @@ export default function GoalDetail() {
       
       <ThemedView style={styles.tags}>
         <InfoTag label="Description" value={goal.description} />
-        <InfoTag label="Deadline" value={goal.deadline} />
-        <InfoTag label="Progress" value={`${goal.count} times`} />
+        <InfoTag label="Start Date" value={goal.startDate} />
+        <InfoTag label="End Date" value={goal.endDate} />
+        <InfoTag label="Progress" value={`${goal.targetCount} times`} />
       </ThemedView>
 
       <PrimaryButton

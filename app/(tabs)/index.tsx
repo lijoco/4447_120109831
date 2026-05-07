@@ -8,8 +8,9 @@ import GoalCard from '@/components/GoalCard';
 import PrimaryButton from '@/components/ui/primary-button';
 import ScreenHeader from '@/components/ui/screen-header';
 import { useRouter } from 'expo-router';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -20,19 +21,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { Goal, GoalContext } from '../_layout';
 
+type Quote = { q: string; a: string };
+
+async function fetchQuote(): Promise<Quote> {
+  const res = await fetch('https://zenquotes.io/api/random');
+  const data = await res.json();
+  return { q: data[0].q, a: data[0].a };
+}
+
 export default function IndexScreen() {
-  // navigation hook
   const router = useRouter();
-  
-  // Access the shared goals state from context provider
   const context = useContext(GoalContext);
-  
-  // State for search functionality. stores whatever the user types in the search box
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // State for count filtering. Tracks which filter button is currently selected
-  // Default is 'All' meaning show all goals regardless of their count
   const [selectedCountFilter, setSelectedCountFilter] = useState('All');
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(true);
+
+  useEffect(() => {
+    fetchQuote()
+      .then(setQuote)
+      .finally(() => setQuoteLoading(false));
+  }, []);
 
   // If context is null, something went wrong with the provider. Return nothing to prevent crashes.
   if (!context) return null;
@@ -85,14 +94,25 @@ export default function IndexScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScreenHeader 
-        title="Goals" 
-        subtitle={`${goals.length} total goals`} 
+      <ScreenHeader
+        title="Goals"
+        subtitle={`${goals.length} total goals`}
       />
 
+      <View style={styles.quoteCard}>
+        {quoteLoading ? (
+          <ActivityIndicator size="small" color="#0A7EA4" />
+        ) : quote ? (
+          <>
+            <ThemedText style={styles.quoteText}>"{quote.q}"</ThemedText>
+            <ThemedText style={styles.quoteAuthor}>— {quote.a}</ThemedText>
+          </>
+        ) : null}
+      </View>
+
       <View style={styles.buttonContainer}>
-        <PrimaryButton 
-          title="Add Goal" 
+        <PrimaryButton
+          title="Add Goal"
           onPress={() => router.push({ pathname: '../add' })}
         />
       </View>
@@ -158,13 +178,34 @@ export default function IndexScreen() {
   );
 }
 
-// STYLES
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  quoteCard: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 14,
+    backgroundColor: '#EAF4F9',
+    minHeight: 60,
+    justifyContent: 'center',
+  },
+  quoteText: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#1A3C4A',
+    marginBottom: 6,
+    lineHeight: 20,
+  },
+  quoteAuthor: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0A7EA4',
+    textAlign: 'right',
+  },
   buttonContainer: {
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
     marginBottom: 16,
   },
   listContent: {

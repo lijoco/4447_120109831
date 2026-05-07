@@ -17,8 +17,11 @@ export type Goal = {
   id: number;
   title: string;
   description: string;
-  deadline: string;
-  count: number;
+  startDate: string;
+  endDate: string;
+  targetCount: number;
+  categoryId: number;
+  userId: number;
 };
 
 type GoalContextType = {

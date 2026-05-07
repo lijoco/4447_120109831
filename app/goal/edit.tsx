@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import FormField from '@/components/ui/form-field';
 import PrimaryButton from '@/components/ui/primary-button';
 import ScreenHeader from '@/components/ui/screen-header';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
@@ -16,15 +16,17 @@ export default function EditGoal() {
   const context = useContext(GoalContext);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [deadline, setDeadline] = useState('');
-  
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   const goal = context?.goals.find((g) => g.id === Number(id));
 
   useEffect(() => {
     if (!goal) return;
     setTitle(goal.title);
     setDescription(goal.description);
-    setDeadline(goal.deadline);
+    setStartDate(goal.startDate);
+    setEndDate(goal.endDate);
   }, [goal]);
 
   if (!context || !goal) return null;
@@ -34,7 +36,7 @@ export default function EditGoal() {
   const saveChanges = async () => {
     await db
       .update(goalsTable)
-      .set({ title, description, deadline })
+      .set({ title, description, startDate, endDate })
       .where(eq(goalsTable.id, Number(id)));
     
     const rows = await db.select().from(goalsTable);
@@ -45,16 +47,19 @@ export default function EditGoal() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScreenHeader title="Edit Goal" subtitle={`Update ${goal.title}`} />
-      <View style={styles.form}>
-        <FormField label="Title" value={title} onChangeText={setTitle} />
-        <FormField label="Description" value={description} onChangeText={setDescription} />
-        <FormField label="Deadline" value={deadline} onChangeText={setDeadline} />
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.form}>
+          <FormField label="Title" value={title} onChangeText={setTitle} />
+          <FormField label="Description" value={description} onChangeText={setDescription} />
+          <FormField label="Start Date" value={startDate} onChangeText={setStartDate} placeholder="YYYY-MM-DD" />
+          <FormField label="End Date" value={endDate} onChangeText={setEndDate} placeholder="YYYY-MM-DD" />
+        </View>
 
-      <PrimaryButton title="Save Changes" onPress={saveChanges} />
-      <View style={styles.buttonSpacing}>
-        <PrimaryButton title="Cancel" variant="secondary" onPress={() => router.back()} />
-      </View>
+        <PrimaryButton title="Save Changes" onPress={saveChanges} />
+        <View style={styles.buttonSpacing}>
+          <PrimaryButton title="Cancel" variant="secondary" onPress={() => router.back()} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -69,5 +74,8 @@ const styles = StyleSheet.create({
   },
   buttonSpacing: {
     marginTop: 10,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
 });
