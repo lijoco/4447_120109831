@@ -1,12 +1,13 @@
-import { useRouter } from 'expo-router';
-import { useContext, useState } from 'react';
+import { ThemedView } from '@/components/themed-view';
 import FormField from '@/components/ui/form-field';
 import PrimaryButton from '@/components/ui/primary-button';
 import ScreenHeader from '@/components/ui/screen-header';
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { db } from '@/db/client';
 import { goals as goalsTable } from '@/db/schema';
+import { useRouter } from 'expo-router';
+import { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoalContext } from './_layout';
 
 export default function AddGoal() {
@@ -35,16 +36,16 @@ export default function AddGoal() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScreenHeader title="Add Goal" subtitle="Create a new goal to track." />
-      <View style={styles.form}>
+      <ThemedView style={styles.form}>
         <FormField label="Title" value={title} onChangeText={setTitle} />
         <FormField label="Description" value={description} onChangeText={setDescription} />
         <FormField label="Deadline" value={deadline} onChangeText={setDeadline} />
-      </View>
+      </ThemedView>
 
       <PrimaryButton title="Save Goal" onPress={saveGoal} />
-      <View style={styles.backButton}>
+      <ThemedView style={styles.backButton}>
         <PrimaryButton title="Cancel" variant="secondary" onPress={() => router.back()} />
-      </View>
+      </ThemedView>
     </SafeAreaView>
   );
 }
