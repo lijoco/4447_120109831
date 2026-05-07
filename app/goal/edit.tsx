@@ -1,48 +1,73 @@
-import { ThemedTextInput } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useContext, useState } from 'react';
-import { Button, } from 'react-native';
-import { Goal, GoalContext } from '../_layout';
-
+import { useContext, useEffect, useState } from 'react';
+import FormField from '@/components/ui/form-field';
+import PrimaryButton from '@/components/ui/primary-button';
+import ScreenHeader from '@/components/ui/screen-header';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { goals as goalsTable } from '@/db/schema';
+import { GoalContext } from '../_layout';
 
 export default function EditGoal() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const context = useContext(GoalContext);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [deadline, setDeadline] = useState('');
+  
+  const goal = context?.goals.find((g) => g.id === Number(id));
 
-  if (!context) return null;
+  useEffect(() => {
+    if (!goal) return;
+    setTitle(goal.title);
+    setDescription(goal.description);
+    setDeadline(goal.deadline);
+  }, [goal]);
 
-  const { goals, setGoals } = context;
+  if (!context || !goal) return null;
 
-  const goal = goals.find(
-    (s: Goal) => s.id === Number(id)
-  );
-
-  if (!goal) return null;
-
-  const [title, setTitle] = useState(goal.title);
-  const [description, setDescription] = useState(goal.description);
-  const [deadline, setDeadline] = useState(goal.deadline);
+  const { setGoals } = context;
 
   const saveChanges = async () => {
-    await db.update(goalsTable).set({ title, description, deadline }).where(eq(goalsTable.id, Number(id)));
+    await db
+      .update(goalsTable)
+      .set({ title, description, deadline })
+      .where(eq(goalsTable.id, Number(id)));
+    
     const rows = await db.select().from(goalsTable);
     setGoals(rows);
     router.back();
   };
 
-//   is not working?? when i click edit, it says unmatched route.
   return (
-    <ThemedView style={{ padding: 20 }}>
-      <ThemedTextInput value={title} onChangeText={setTitle} />
-      <ThemedTextInput value={description} onChangeText={setDescription} />
-      <ThemedTextInput value={deadline} onChangeText={setDeadline} />
+    <SafeAreaView style={styles.safeArea}>
+      <ScreenHeader title="Edit Goal" subtitle={`Update ${goal.title}`} />
+      <View style={styles.form}>
+        <FormField label="Title" value={title} onChangeText={setTitle} />
+        <FormField label="Description" value={description} onChangeText={setDescription} />
+        <FormField label="Deadline" value={deadline} onChangeText={setDeadline} />
+      </View>
 
-      <Button title="Save Changes" onPress={saveChanges} />
-    </ThemedView>
+      <PrimaryButton title="Save Changes" onPress={saveChanges} />
+      <View style={styles.buttonSpacing}>
+        <PrimaryButton title="Cancel" variant="secondary" onPress={() => router.back()} />
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    padding: 20,
+  },
+  form: {
+    marginBottom: 6,
+  },
+  buttonSpacing: {
+    marginTop: 10,
+  },
+});
