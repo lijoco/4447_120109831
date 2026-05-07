@@ -3,8 +3,9 @@ import { useContext } from 'react';
 import InfoTag from '@/components/ui/info-tag';
 import PrimaryButton from '@/components/ui/primary-button';
 import ScreenHeader from '@/components/ui/screen-header';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedView } from '@/components/themed-view';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { goals as goalsTable } from '@/db/schema';
@@ -32,11 +33,11 @@ export default function GoalDetail() {
     <SafeAreaView style={styles.safeArea}>
       <ScreenHeader title={goal.title} subtitle="Goal details" />
       
-      <View style={styles.tags}>
+      <ThemedView style={styles.tags}>
         <InfoTag label="Description" value={goal.description} />
         <InfoTag label="Deadline" value={goal.deadline} />
         <InfoTag label="Progress" value={`${goal.count} times`} />
-      </View>
+      </ThemedView>
 
       <PrimaryButton
         title="Edit"
@@ -48,12 +49,12 @@ export default function GoalDetail() {
         }
       />
 
-      <View style={styles.buttonSpacing}>
+      <ThemedView style={styles.buttonSpacing}>
         <PrimaryButton title="Delete" variant="danger" onPress={deleteGoal} />
-      </View>
-      <View style={styles.buttonSpacing}>
+      </ThemedView>
+      <ThemedView style={styles.buttonSpacing}>
         <PrimaryButton title="Back" variant="secondary" onPress={() => router.back()} />
-      </View>
+      </ThemedView>
     </SafeAreaView>
   );
 }

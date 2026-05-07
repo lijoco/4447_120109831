@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginRight: 8,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 3,
+    marginTop: 6,
   },
   label: {
     fontSize: 12,
