@@ -1,18 +1,19 @@
 import GoalCard from '@/components/GoalCard';
 import { ThemedText, ThemedTextInput } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useState, useContext } from 'react';
 import { Button, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Goal, GoalContext } from '../_layout';
 
-type Goal = {
-  id: number;
-  title: string;
-  description: string;
-  deadline: string;
-  count: number;
-};
-
+// type Goal = {
+//   id: number;
+//   title: string;
+//   description: string;
+//   deadline: string;
+//   count: number;
+// };
 
 export default function IndexScreen() {
   const [goals, setGoals] = useState<Goal[]>([
@@ -142,7 +143,7 @@ export default function IndexScreen() {
                 No goals yet. Add one above!
               </ThemedText>
             ) : null}
-            
+
             {/* Cards */}
             {goals.map(goal => (
               <GoalCard
