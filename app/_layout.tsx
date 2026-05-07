@@ -1,8 +1,13 @@
 import { Stack } from 'expo-router';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+import { db } from '@/db/client';
+import { goals as goalsTable } from '@/db/schema';
+import { seedGoalsIfEmpty } from '@/db/seed';
+
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -26,11 +31,18 @@ export const GoalContext = createContext<GoalContextType | null>(null);
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: 1, title: "UX", description: "Attend all", deadline: "May", count: 0 },
-    { id: 2, title: "AI", description: "Attend all", deadline: "May", count: 0 },
-    { id: 3, title: "Mobile Dev", description: "Attend all", deadline: "May", count: 0 },
-  ]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+
+  // Add useEffect on mount to load data from SQLite
+  useEffect(() => {
+    const loadGoals = async () => {
+      await seedGoalsIfEmpty(); // Ensure the database is seeded
+      const rows = await db.select().from(goalsTable);
+      setGoals(rows);
+    };
+
+    void loadGoals();
+  }, []);
 
   return (
     // <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

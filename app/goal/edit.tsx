@@ -5,6 +5,10 @@ import { useContext, useState } from 'react';
 import { Button, } from 'react-native';
 import { Goal, GoalContext } from '../_layout';
 
+import { eq } from 'drizzle-orm';
+import { db } from '@/db/client';
+import { goals as goalsTable } from '@/db/schema';
+
 export default function EditGoal() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -24,18 +28,14 @@ export default function EditGoal() {
   const [description, setDescription] = useState(goal.description);
   const [deadline, setDeadline] = useState(goal.deadline);
 
-  const saveChanges = () => {
-    setGoals(
-      goals.map(s =>
-        s.id === Number(id)
-          ? { ...s, title, description, deadline }
-          : s
-      )
-    );
-
+  const saveChanges = async () => {
+    await db.update(goalsTable).set({ title, description, deadline }).where(eq(goalsTable.id, Number(id)));
+    const rows = await db.select().from(goalsTable);
+    setGoals(rows);
     router.back();
   };
 
+//   is not working?? when i click edit, it says unmatched route.
   return (
     <ThemedView style={{ padding: 20 }}>
       <ThemedTextInput value={title} onChangeText={setTitle} />

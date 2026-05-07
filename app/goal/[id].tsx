@@ -5,6 +5,10 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Goal, GoalContext } from '../_layout';
 
+import { eq } from 'drizzle-orm';
+import { db } from '@/db/client';
+import { goals as goalsTable } from '@/db/schema';
+
 export default function GoalDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -20,8 +24,10 @@ export default function GoalDetail() {
 
   if (!goal) return null;
 
-  const deleteGoal = () => {
-    setGoals(goals.filter(g => g.id !== Number(id)));
+  const deleteGoal = async () => {
+    await db.delete(goalsTable).where(eq(goalsTable.id, Number(id)));
+    const rows = await db.select().from(goalsTable);
+    setGoals(rows);
     router.back();
   };
 
@@ -35,7 +41,7 @@ export default function GoalDetail() {
         title="Edit"
         onPress={() =>
           router.push({
-            pathname: '../goal/[id]/edit',
+            pathname: 'goal/edit',
             params: { id }
           })
         }

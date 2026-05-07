@@ -3,6 +3,8 @@ import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Button, View } from 'react-native';
 import { GoalContext } from './_layout';
+import {db} from '@/db/client';
+import {goals as goalsTable} from '@/db/schema';
 
 export default function AddGoal() {
   const router = useRouter();
@@ -10,26 +12,28 @@ export default function AddGoal() {
 
   if (!context) return null;
  
-  const { goals, setGoals } = context;
+  const { setGoals } = context;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
 
-  const saveGoal = () => {
-    const newGoal = {
-      id: Date.now(),
+  const saveGoal = async () => {
+    await db.insert(goalsTable).values({
       title,
       description,
       deadline,
       count: 0,
-    };
+    });
 
-    setGoals([...goals, newGoal]);
+    const rows = await db.select().from(goalsTable);
+    setGoals(rows);
     router.back();
   };
 
   return (
+
+    // It is allowing empty fields to be added, but I will add validation later
     <View style={{ padding: 20 }}>
       <ThemedTextInput placeholder="Goal Title" value={title} onChangeText={setTitle} />
       <ThemedTextInput placeholder="Goal Description" value={description} onChangeText={setDescription} />
